@@ -41,7 +41,7 @@ const getTodayDate = () => {
 
 const fetchEvents = async (): Promise<{ title: string; data: FlightEvent[] }[]> => {
   try {
-    const response = await axios.get<FlightEvent[]>('http://192.168.1.13:3001/api/flights');
+    const response = await axios.get<FlightEvent[]>('http://192.168.1.109:3001/api/flights');
     const data = response.data;
 
     // Map the API data to match the calendar structure
@@ -87,11 +87,39 @@ export default function CalendarTab() {
   };
 
   const formatTime = (time: string) => {
-    // Split the time into hours, minutes, and seconds
+    if (!time) return ''; // Return an empty string if time is null or undefined
+  
     const [hours, minutes] = time.split(':');
-    // Convert the hours to a number to remove leading zero
-    const formattedHours = parseInt(hours, 10).toString();
+  
+    // Check if hours or minutes are invalid (e.g., undefined or empty)
+    if (!hours || !minutes) return time; // Return the original time if the format is invalid
+  
+    const formattedHours = parseInt(hours, 10).toString(); // Convert hours to a number to remove leading zero
     return `${formattedHours}:${minutes}`;
+  };
+
+  const calculateDutyPeriod = (startTime: string, endTime: string): string => {
+    if (!startTime || !endTime) return ''; // Return an empty string if either time is null or undefined
+  
+    const [startHours, startMinutes] = startTime.split(':');
+    const [endHours, endMinutes] = endTime.split(':');
+  
+    // Check if hours or minutes are invalid (e.g., undefined or empty)
+    if (!startHours || !startMinutes || !endHours || !endMinutes) return ''; // Return empty if the format is invalid
+  
+    const startDate = new Date();
+    startDate.setHours(parseInt(startHours, 10), parseInt(startMinutes, 10), 0);
+  
+    const endDate = new Date();
+    endDate.setHours(parseInt(endHours, 10), parseInt(endMinutes, 10), 0);
+  
+    const differenceInMilliseconds = endDate.getTime() - startDate.getTime();
+    const differenceInMinutes = differenceInMilliseconds / (1000 * 60);
+  
+    const hours = Math.floor(differenceInMinutes / 60);
+    const minutes = differenceInMinutes % 60;
+  
+    return `${hours}:${minutes.toString().padStart(2, '0')}`; // Ensure minutes are 2 digits
   };
 
   return (
@@ -111,7 +139,7 @@ export default function CalendarTab() {
           renderItem={({ item }) => (
 
             
-
+             
             <TouchableOpacity style={styles.item}>
               <Text className='p-5 text-xl text-blue-700'>My Duty Period</Text>
               <Text className='border-t-2 border-gray-300'></Text>
@@ -129,17 +157,16 @@ export default function CalendarTab() {
               </View>
               <View className='flex flex-row pl-5 pt-5 justify-between'>
                 <Text>Max Duty Period</Text>
-                <Text>12:00</Text>
+                <Text>{calculateDutyPeriod(item.dutyReportTime, item.dutyDebriefEnd)}</Text>
               </View>
               <View className='pl-5 pt-3'>
-                <ProgressBar progress={0.5} theme={{ colors: { primary: 'blue' } }} style={progressStyle.progressBar}/>
+                <ProgressBar progress={0.3} theme={{ colors: { primary: 'blue' } }} style={progressStyle.progressBar}/>
               </View>
               <View className='flex flex-row pl-5 pt-3 justify-between'>
                 <Text>Duty Period Ends</Text>
                 <View className='flex flex-row'>
-                  <Text className='pr-5'>{item.date}</Text>
                   <Text>
-                  {formatTime(item.dutyReportTime)}-{formatTime(item.dutyDebriefEnd)}
+                  {formatTime(item.dutyReportTime)} - {formatTime(item.dutyDebriefEnd)}
                   </Text>
                 </View>
               </View>
