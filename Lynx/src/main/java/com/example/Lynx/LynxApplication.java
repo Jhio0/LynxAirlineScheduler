@@ -33,6 +33,8 @@ public class LynxApplication {
 						.allowedOrigins("http://localhost:8081")
 						.allowedOrigins("exp://192.168.1.109:8081")
 						.allowedOrigins("http://192.168.1.109:8081")
+						.allowedOrigins("http://192.168.1.13:8081")
+						.allowedOrigins("exp://192.168.1.13:8081")
 						.allowedMethods("*")
 						.allowedHeaders("*");
 			}

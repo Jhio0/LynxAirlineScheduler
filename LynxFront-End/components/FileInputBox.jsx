@@ -48,7 +48,7 @@ const handleUpload = async () => {
   });
 
   try {
-    const response = await axios.post("http://192.168.1.109:3001/api/upload/excel", formData, {
+    const response = await axios.post("http://192.168.1.13:3001/api/upload/excel", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

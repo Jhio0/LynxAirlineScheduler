@@ -4,11 +4,6 @@ VALUES ('John Doe', 'johndoe@example.com', 'hashedpassword123', 'Captain');
 INSERT INTO Aircraft (AC_Type)
 VALUES ('Boeing 737');
 
-INSERT INTO Station (StationID, StationName, StationAddress)
-VALUES 
-    ('S001', 'Los Angeles International Airport', '1 World Way, Los Angeles, CA'),
-    ('S002', 'John F. Kennedy International Airport', 'JFK Access Rd, New York, NY');
-
 -- Insert data into Flight table
 INSERT INTO Flight (PilotID, AircraftID, Date, PairingActivity, DutyReportTime, DEPSTN, ARRSTN, DutyDebriefEnd, FlyingHours, DutyHours, Hotel, UpdatedBy, File)
 VALUES (

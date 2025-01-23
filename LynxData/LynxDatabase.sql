@@ -35,5 +35,6 @@ CREATE TABLE Flight (
     
     -- Define foreign keys and cascade rules
     FOREIGN KEY (PilotID) REFERENCES Pilot(PilotID) ON DELETE CASCADE,
-    FOREIGN KEY (AircraftID) REFERENCES Aircraft(AircraftID) ON DELETE CASCADE,  -- Altered to match AircraftID as VARCHAR
+    FOREIGN KEY (AircraftID) REFERENCES Aircraft(AircraftID) ON DELETE CASCADE  -- No comma here
 );
+

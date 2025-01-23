@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ExpandableCalendar, CalendarProvider, AgendaList } from 'react-native-calendars';
+import { ProgressBar, MD3Colors } from 'react-native-paper';
 import axios from 'axios';
 
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Define type for each marked date entry
 type MarkedDate = {
@@ -20,8 +21,8 @@ interface FlightEvent {
   date: string;
   pairingActivity: string;
   dutyReportTime: string;
-  departureStationID: string;
-  arrivalStationID: string;
+  departureStation: string;
+  arrivalStation: string;
   dutyDebriefEnd: string;
   flyingHours: string;
   dutyHours: string;
@@ -38,23 +39,15 @@ const getTodayDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-const fetchEvents = async (): Promise<{ title: string, data: { name: string, [key: string]: any }[] }[]> => {
+const fetchEvents = async (): Promise<{ title: string; data: FlightEvent[] }[]> => {
   try {
-    const response = await axios.get<FlightEvent[]>('http://192.168.1.109:3001/api/flights');
+    const response = await axios.get<FlightEvent[]>('http://192.168.1.13:3001/api/flights');
     const data = response.data;
 
-    // Map the API data to the calendar event structure
+    // Map the API data to match the calendar structure
     return data.map((flight: FlightEvent) => ({
       title: flight.date,
-      data: [{
-        name: `${flight.pairingActivity} at ${flight.dutyReportTime}`,
-        pilotID: flight.pilotID,
-        aircraftID: flight.aircraftID,
-        flightID: flight.flightID,
-        departureStation: flight.departureStationID,
-        arrivalStation: flight.arrivalStationID,
-        hotel: flight.hotel,
-      }],
+      data: [flight], // Directly pass the full FlightEvent object
     }));
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -64,7 +57,7 @@ const fetchEvents = async (): Promise<{ title: string, data: { name: string, [ke
 
 export default function CalendarTab() {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
-  const [events, setEvents] = useState<{ title: string, data: { name: string, [key: string]: any }[] }[]>([]); // State to hold the events data
+  const [events, setEvents] = useState<{ title: string, data: {[key: string]: any }[] }[]>([]); // State to hold the events data
 
   useEffect(() => {
     // Fetch events on component mount
@@ -93,6 +86,13 @@ export default function CalendarTab() {
     selectedColor: 'grey',  // Color for selected date
   };
 
+  const formatTime = (time: string) => {
+    // Split the time into hours, minutes, and seconds
+    const [hours, minutes] = time.split(':');
+    // Convert the hours to a number to remove leading zero
+    const formattedHours = parseInt(hours, 10).toString();
+    return `${formattedHours}:${minutes}`;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -100,18 +100,55 @@ export default function CalendarTab() {
         date={selectedDate}
         onDateChanged={(date) => setSelectedDate(date)}    
       >
-        <ExpandableCalendar 
+        <ExpandableCalendar p-5
           initialPosition={ExpandableCalendar.positions.OPEN} 
           markedDates={markedDates}
           closeOnDayPress={true}
           pagingEnabled={true}
         />
         <AgendaList
-          sections={filteredEvents.length ? filteredEvents : [{ title: 'No Events', data: [{ name: 'No events for this day' }] }]}
+          sections={filteredEvents.length > 0 ? filteredEvents : []}
           renderItem={({ item }) => (
+
+            
+
             <TouchableOpacity style={styles.item}>
-              <Text>{item.name}</Text>
+              <Text className='p-5 text-xl text-blue-700'>My Duty Period</Text>
+              <Text className='border-t-2 border-gray-300'></Text>
+              <View className='flex flex-row pl-5 justify-between'>
+                  <Icon name="airplanemode-active" size={40} color="#4F8EF7" />
+                  <View className='flex items-center justify-center'>
+                    <Text className='text-lg'>{item.departureStation}</Text>
+                  </View>
+                  <View className='flex items-center justify-center'>
+                    <Icon name="arrow-forward" size={20} color="#000000" />
+                  </View>
+                  <View className='flex items-center justify-center pr-5'>
+                    <Text className='text-lg'>{item.arrivalStation}</Text>
+                  </View>
+              </View>
+              <View className='flex flex-row pl-5 pt-5 justify-between'>
+                <Text>Max Duty Period</Text>
+                <Text>12:00</Text>
+              </View>
+              <View className='pl-5 pt-3'>
+                <ProgressBar progress={0.5} theme={{ colors: { primary: 'blue' } }} style={progressStyle.progressBar}/>
+              </View>
+              <View className='flex flex-row pl-5 pt-3 justify-between'>
+                <Text>Duty Period Ends</Text>
+                <View className='flex flex-row'>
+                  <Text className='pr-5'>{item.date}</Text>
+                  <Text>
+                  {formatTime(item.dutyReportTime)}-{formatTime(item.dutyDebriefEnd)}
+                  </Text>
+                </View>
+              </View>
             </TouchableOpacity>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{ padding: 10 }}>
+              <Text>No events for the selected date.</Text>
+            </View>
           )}
         />
       </CalendarProvider>
@@ -140,5 +177,23 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+});
+
+const progressStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  progressBar: {
+    width: '100%', // Adjust width
+    height: 9,   // Adjust height
+    borderRadius: 5, // Add rounded corners
   },
 });

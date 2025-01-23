@@ -38,7 +38,7 @@ public class FlightService {
         flightDTO.setPairingActivity(flight.getPairingActivity());
         flightDTO.setDutyReportTime(flight.getDutyReportTime());
         flightDTO.setDepartureStation(flight.getDepartureStation());
-        flightDTO.setDepartureStation(flight.getArrivalStation());
+        flightDTO.setArrivalStation(flight.getArrivalStation());
         flightDTO.setDutyDebriefEnd(flight.getDutyDebriefEnd());
         flightDTO.setFlyingHours(flight.getFlyingHours());
         flightDTO.setDutyHours(flight.getDutyHours());
