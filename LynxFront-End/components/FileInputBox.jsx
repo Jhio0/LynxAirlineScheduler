@@ -64,13 +64,22 @@ const handleUpload = async () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.box} onPress={handleFilePick}>
-        <Text style={styles.text}>
-          {selectedFile ? `Selected File: ${selectedFile}` : "Tap to upload a file"}
-        </Text>
-      </TouchableOpacity>
+      {/* <TouchableOpacity>
+        <Image 
+          source={require('../assets/images/Airline.jpg')} 
+          style={styles.image}
+        />
+      </TouchableOpacity> */}
 
-      <Button title="Upload File" onPress={handleUpload} />
+        <TouchableOpacity style={styles.box} onPress={handleFilePick}>
+          <Text style={styles.text}>
+            {selectedFile ? `Selected File: ${selectedFile}` : "Tap to upload a file"}
+          </Text>
+        </TouchableOpacity>
+        <View className="mt-5">
+          <Button className="bg-black" title="Upload File" onPress={handleUpload} />\
+        </View>
+
     </View>
   );
 };
@@ -79,21 +88,21 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 20,
+    marginVertical: 50
   },
   box: {
-    width: 300,
-    height: 150,
+    width: 250,
+    height: 100,
     borderWidth: 2,
     borderColor: "#aaa",
     borderStyle: "dotted",
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "transparent",
   },
   text: {
-    color: "#333",
+    color: "#ffff",
     fontSize: 16,
     textAlign: "center",
   },

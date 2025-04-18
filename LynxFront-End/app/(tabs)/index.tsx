@@ -1,13 +1,15 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, ImageBackground} from 'react-native';
 import { Text } from 'react-native-paper';
 import FileInputBox from '../../components/FileInputBox'
 
 export default function HomeScreen() {
   return (
-    <View className='flex items-center justify-center h-screen'>
-      <FileInputBox/>
-    </View>
+    <ImageBackground source={require('../../assets/images/Airline.jpg')} className='flex-1'>
+      <View className='flex-1 items-center justify-end'>
+        <FileInputBox/>
+      </View>
+    </ImageBackground>
   );
 }
 
