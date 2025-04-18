@@ -98,30 +98,20 @@ export default function CalendarTab() {
     return `${formattedHours}:${minutes}`;
   };
 
-  const calculateDutyPeriod = (startTime: string, endTime: string): string => {
-    if (!startTime || !endTime) return ''; // Return an empty string if either time is null or undefined
+  const calculateMaxDutyPeriod = (time: string) => { 
+    if (!time) return 0;
   
-    const [startHours, startMinutes] = startTime.split(':');
-    const [endHours, endMinutes] = endTime.split(':');
+    // Split the time into hours and minutes
+    const [hours, minutes] = time.split(':');
+    
+    // Calculate decimal time
+    const decimalTime = parseInt(hours, 10) + parseInt(minutes, 10) / 60;
   
-    // Check if hours or minutes are invalid (e.g., undefined or empty)
-    if (!startHours || !startMinutes || !endHours || !endMinutes) return ''; // Return empty if the format is invalid
-  
-    const startDate = new Date();
-    startDate.setHours(parseInt(startHours, 10), parseInt(startMinutes, 10), 0);
-  
-    const endDate = new Date();
-    endDate.setHours(parseInt(endHours, 10), parseInt(endMinutes, 10), 0);
-  
-    const differenceInMilliseconds = endDate.getTime() - startDate.getTime();
-    const differenceInMinutes = differenceInMilliseconds / (1000 * 60);
-  
-    const hours = Math.floor(differenceInMinutes / 60);
-    const minutes = differenceInMinutes % 60;
-  
-    return `${hours}:${minutes.toString().padStart(2, '0')}`; // Ensure minutes are 2 digits
+    // Round the result to 2 decimal places
+    return parseFloat(decimalTime.toFixed(1));
   };
-
+  
+  
   return (
     <SafeAreaView style={styles.container}>
       <CalendarProvider
@@ -137,7 +127,7 @@ export default function CalendarTab() {
         <AgendaList
           sections={filteredEvents.length > 0 ? filteredEvents : []}
           renderItem={({ item }) => (
-
+          
             
              
             <TouchableOpacity style={styles.item}>
@@ -157,10 +147,14 @@ export default function CalendarTab() {
               </View>
               <View className='flex flex-row pl-5 pt-5 justify-between'>
                 <Text>Max Duty Period</Text>
-                <Text>{calculateDutyPeriod(item.dutyReportTime, item.dutyDebriefEnd)}</Text>
+                <Text>12:00</Text>
+              </View>
+              <View className='flex flex-row pl-5 pt-2 justify-between'>
+                <Text>Duty Hours</Text>
+                <Text>{formatTime(item.dutyHours)}</Text>
               </View>
               <View className='pl-5 pt-3'>
-                <ProgressBar progress={0.3} theme={{ colors: { primary: 'blue' } }} style={progressStyle.progressBar}/>
+                <ProgressBar progress={calculateMaxDutyPeriod(item.dutyHours) / 24} theme={{ colors: { primary: 'blue' } }} style={progressStyle.progressBar}/>
               </View>
               <View className='flex flex-row pl-5 pt-3 justify-between'>
                 <Text>Duty Period Ends</Text>
@@ -169,6 +163,14 @@ export default function CalendarTab() {
                   {formatTime(item.dutyReportTime)} - {formatTime(item.dutyDebriefEnd)}
                   </Text>
                 </View>
+              </View>
+              <View className='flex flex-row pl-5 pt-2 justify-between'>
+                <Text>Pairing Activity</Text>
+                <Text>{item.pairingActivity}</Text>
+              </View>
+              <View className='flex flex-row pl-5 pt-2 justify-between'>
+                <Text>Flying Hours</Text>
+                <Text>{formatTime(item.flyingHours)}</Text>
               </View>
             </TouchableOpacity>
           )}
